@@ -1,0 +1,123 @@
+@import "tailwindcss";
+
+:root {
+  --pitch: #0d6b3f;
+  --pitch-deep: #084d2d;
+  --pitch-bright: #14a85c;
+  --night: #0b1210;
+  --night-elevated: #121c18;
+  --night-border: #1e2e26;
+  --chalk: #f4f7f5;
+  --mist: #a8b8b0;
+  --gold: #d4a017;
+  --danger: #e24b4b;
+  --qualify: rgba(20, 168, 92, 0.18);
+  --eliminate: rgba(226, 75, 75, 0.12);
+  --background: var(--night);
+  --foreground: var(--chalk);
+  --surface: var(--night-elevated);
+  --border: var(--night-border);
+  --accent: var(--pitch-bright);
+  --accent-deep: var(--pitch);
+}
+
+[data-theme="light"] {
+  --background: #eef3f0;
+  --foreground: #0b1210;
+  --surface: #ffffff;
+  --border: #c5d4cb;
+  --mist: #5a6b62;
+  --qualify: rgba(13, 107, 63, 0.12);
+  --eliminate: rgba(226, 75, 75, 0.08);
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-surface: var(--surface);
+  --color-border: var(--border);
+  --color-accent: var(--accent);
+  --color-accent-deep: var(--accent-deep);
+  --color-pitch: var(--pitch);
+  --color-pitch-deep: var(--pitch-deep);
+  --color-pitch-bright: var(--pitch-bright);
+  --color-night: var(--night);
+  --color-chalk: var(--chalk);
+  --color-mist: var(--mist);
+  --color-gold: var(--gold);
+  --color-danger: var(--danger);
+  --font-sans: var(--font-body);
+  --font-display: var(--font-display);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-body), system-ui, sans-serif;
+  min-height: 100dvh;
+}
+
+::selection {
+  background: var(--pitch-bright);
+  color: white;
+}
+
+.font-display {
+  font-family: var(--font-display), Impact, sans-serif;
+  letter-spacing: 0.02em;
+}
+
+.pitch-bg {
+  background:
+    radial-gradient(ellipse 80% 50% at 50% 0%, rgba(20, 168, 92, 0.22), transparent 55%),
+    linear-gradient(180deg, #0b1210 0%, #0d1a14 40%, #084d2d 100%);
+}
+
+.pitch-lines {
+  background-image:
+    linear-gradient(rgba(255, 255, 255, 0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.04) 1px, transparent 1px);
+  background-size: 48px 48px;
+}
+
+.qualify-row {
+  background: var(--qualify);
+}
+
+.eliminate-row {
+  background: var(--eliminate);
+}
+
+.form-w {
+  background: var(--pitch-bright);
+  color: white;
+}
+.form-d {
+  background: #6b7280;
+  color: white;
+}
+.form-l {
+  background: var(--danger);
+  color: white;
+}
+
+@media print {
+  body {
+    background: white !important;
+    color: black !important;
+  }
+  .no-print {
+    display: none !important;
+  }
+  .print-break {
+    break-before: page;
+  }
+}

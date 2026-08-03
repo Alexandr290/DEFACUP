@@ -10,7 +10,7 @@ export function LanguageSwitcher({ className }: { className?: string }) {
   return (
     <div
       className={cn(
-        "inline-flex items-center rounded-md border border-border bg-surface/60 p-0.5",
+        "inline-flex shrink-0 items-center rounded-md border-2 border-accent/60 bg-surface p-0.5 shadow-sm",
         className
       )}
       role="group"
@@ -22,10 +22,10 @@ export function LanguageSwitcher({ className }: { className?: string }) {
           type="button"
           onClick={() => setLocale(item.id as Locale)}
           className={cn(
-            "rounded px-2 py-1 text-xs font-bold tracking-wide transition-colors",
+            "min-w-9 rounded px-2.5 py-1.5 text-xs font-bold tracking-wider transition-colors",
             locale === item.id
               ? "bg-accent text-white"
-              : "text-mist hover:text-foreground"
+              : "text-foreground/70 hover:bg-accent/15 hover:text-foreground"
           )}
         >
           {item.label}

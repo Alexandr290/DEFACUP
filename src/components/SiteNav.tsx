@@ -54,9 +54,9 @@ export function SiteNav() {
   ];
 
   return (
-    <header className="no-print sticky top-0 z-50 border-b border-border/80 bg-background/80 backdrop-blur-md">
-      <div className="mx-auto flex h-14 max-w-7xl items-center justify-between px-4 sm:px-6">
-        <Link href="/" className="flex items-center gap-2 group">
+    <header className="no-print sticky top-0 z-50 border-b border-border/80 bg-background/90 backdrop-blur-md">
+      <div className="mx-auto flex h-14 max-w-7xl items-center gap-3 px-4 sm:px-6">
+        <Link href="/" className="flex shrink-0 items-center gap-2 group">
           <span className="flex h-8 w-8 items-center justify-center rounded bg-accent text-white">
             <Trophy className="h-4 w-4" />
           </span>
@@ -64,7 +64,11 @@ export function SiteNav() {
             DEFACUP
           </span>
         </Link>
-        <nav className="hidden items-center gap-1 sm:flex">
+
+        {/* Always visible, right next to the logo */}
+        <LanguageSwitcher />
+
+        <nav className="ml-2 hidden items-center gap-1 sm:flex">
           {links.map((l) => (
             <Link
               key={l.href}
@@ -80,8 +84,8 @@ export function SiteNav() {
             </Link>
           ))}
         </nav>
-        <div className="flex items-center gap-2">
-          <LanguageSwitcher />
+
+        <div className="ml-auto flex shrink-0 items-center gap-2">
           <button
             type="button"
             onClick={toggleTheme}

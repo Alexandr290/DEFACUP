@@ -1,18 +1,24 @@
 import type { Metadata } from "next";
-import { Bebas_Neue, Source_Sans_3 } from "next/font/google";
+import { Bebas_Neue, Oswald, Source_Sans_3 } from "next/font/google";
 import { SiteFooter } from "@/components/SiteFooter";
 import { SiteNav } from "@/components/SiteNav";
 import { StoreHydrator } from "@/components/StoreHydrator";
+import { LanguageProvider } from "@/lib/i18n/context";
 import "./globals.css";
 
-const display = Bebas_Neue({
+const displayBrand = Bebas_Neue({
   weight: "400",
   subsets: ["latin"],
+  variable: "--font-display-brand",
+});
+
+const display = Oswald({
+  subsets: ["latin", "cyrillic"],
   variable: "--font-display",
 });
 
 const body = Source_Sans_3({
-  subsets: ["latin"],
+  subsets: ["latin", "cyrillic"],
   variable: "--font-body",
 });
 
@@ -30,13 +36,15 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body
-        className={`${display.variable} ${body.variable} antialiased flex min-h-dvh flex-col`}
+        className={`${displayBrand.variable} ${display.variable} ${body.variable} antialiased flex min-h-dvh flex-col`}
       >
-        <StoreHydrator>
-          <SiteNav />
-          <main className="flex-1">{children}</main>
-          <SiteFooter />
-        </StoreHydrator>
+        <LanguageProvider>
+          <StoreHydrator>
+            <SiteNav />
+            <main className="flex-1">{children}</main>
+            <SiteFooter />
+          </StoreHydrator>
+        </LanguageProvider>
       </body>
     </html>
   );

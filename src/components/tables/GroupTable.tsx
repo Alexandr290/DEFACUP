@@ -1,6 +1,7 @@
 "use client";
 
 import type { StandingRow, Team } from "@/lib/types";
+import { useI18n } from "@/lib/i18n/context";
 import { cn } from "@/lib/utils";
 
 export function GroupTable({
@@ -16,14 +17,17 @@ export function GroupTable({
   qualifyCount: number;
   bestThirdHighlight?: boolean;
 }) {
-  const teamMap = new Map(teams.map((t) => [t.id, t]));
+  const { t } = useI18n();
+  const teamMap = new Map(teams.map((team) => [team.id, team]));
 
   return (
     <div className="overflow-hidden rounded-lg border border-border bg-surface/60">
       <div className="flex items-center justify-between border-b border-border px-4 py-3">
-        <h3 className="font-display text-2xl tracking-wide">Group {title}</h3>
+        <h3 className="font-display text-2xl tracking-wide">
+          {t("table.group", { name: title })}
+        </h3>
         <span className="text-xs uppercase tracking-wider text-mist">
-          Top {qualifyCount} qualify
+          {t("table.topQualify", { count: qualifyCount })}
         </span>
       </div>
       <div className="overflow-x-auto">
@@ -31,16 +35,16 @@ export function GroupTable({
           <thead>
             <tr className="text-left text-xs uppercase tracking-wider text-mist">
               <th className="px-3 py-2 font-medium">#</th>
-              <th className="px-3 py-2 font-medium">Team</th>
-              <th className="px-2 py-2 font-medium text-center">Pld</th>
-              <th className="px-2 py-2 font-medium text-center">W</th>
-              <th className="px-2 py-2 font-medium text-center">D</th>
-              <th className="px-2 py-2 font-medium text-center">L</th>
-              <th className="px-2 py-2 font-medium text-center">GF</th>
-              <th className="px-2 py-2 font-medium text-center">GA</th>
-              <th className="px-2 py-2 font-medium text-center">GD</th>
-              <th className="px-2 py-2 font-medium text-center">Pts</th>
-              <th className="px-3 py-2 font-medium">Form</th>
+              <th className="px-3 py-2 font-medium">{t("table.team")}</th>
+              <th className="px-2 py-2 font-medium text-center">{t("table.pld")}</th>
+              <th className="px-2 py-2 font-medium text-center">{t("table.w")}</th>
+              <th className="px-2 py-2 font-medium text-center">{t("table.d")}</th>
+              <th className="px-2 py-2 font-medium text-center">{t("table.l")}</th>
+              <th className="px-2 py-2 font-medium text-center">{t("table.gf")}</th>
+              <th className="px-2 py-2 font-medium text-center">{t("table.ga")}</th>
+              <th className="px-2 py-2 font-medium text-center">{t("table.gd")}</th>
+              <th className="px-2 py-2 font-medium text-center">{t("table.pts")}</th>
+              <th className="px-3 py-2 font-medium">{t("table.form")}</th>
             </tr>
           </thead>
           <tbody>
@@ -56,10 +60,16 @@ export function GroupTable({
                     "border-t border-border/60 transition-colors",
                     isQualify && "qualify-row",
                     isBestThird && "bg-gold/10",
-                    !isQualify && !isBestThird && row.rank > qualifyCount + (bestThirdHighlight ? 1 : 0) && "eliminate-row"
+                    !isQualify &&
+                      !isBestThird &&
+                      row.rank >
+                        qualifyCount + (bestThirdHighlight ? 1 : 0) &&
+                      "eliminate-row"
                   )}
                 >
-                  <td className="px-3 py-2.5 tabular-nums text-mist">{row.rank}</td>
+                  <td className="px-3 py-2.5 tabular-nums text-mist">
+                    {row.rank}
+                  </td>
                   <td className="px-3 py-2.5">
                     <div className="flex items-center gap-2">
                       <span
@@ -68,17 +78,33 @@ export function GroupTable({
                       >
                         {team?.short_code?.slice(0, 3) ?? "?"}
                       </span>
-                      <span className="font-semibold">{team?.name ?? "Unknown"}</span>
+                      <span className="font-semibold">
+                        {team?.name ?? "Unknown"}
+                      </span>
                     </div>
                   </td>
-                  <td className="px-2 py-2.5 text-center tabular-nums">{row.played}</td>
-                  <td className="px-2 py-2.5 text-center tabular-nums">{row.won}</td>
-                  <td className="px-2 py-2.5 text-center tabular-nums">{row.drawn}</td>
-                  <td className="px-2 py-2.5 text-center tabular-nums">{row.lost}</td>
-                  <td className="px-2 py-2.5 text-center tabular-nums">{row.goalsFor}</td>
-                  <td className="px-2 py-2.5 text-center tabular-nums">{row.goalsAgainst}</td>
                   <td className="px-2 py-2.5 text-center tabular-nums">
-                    {row.goalDifference > 0 ? `+${row.goalDifference}` : row.goalDifference}
+                    {row.played}
+                  </td>
+                  <td className="px-2 py-2.5 text-center tabular-nums">
+                    {row.won}
+                  </td>
+                  <td className="px-2 py-2.5 text-center tabular-nums">
+                    {row.drawn}
+                  </td>
+                  <td className="px-2 py-2.5 text-center tabular-nums">
+                    {row.lost}
+                  </td>
+                  <td className="px-2 py-2.5 text-center tabular-nums">
+                    {row.goalsFor}
+                  </td>
+                  <td className="px-2 py-2.5 text-center tabular-nums">
+                    {row.goalsAgainst}
+                  </td>
+                  <td className="px-2 py-2.5 text-center tabular-nums">
+                    {row.goalDifference > 0
+                      ? `+${row.goalDifference}`
+                      : row.goalDifference}
                   </td>
                   <td className="px-2 py-2.5 text-center text-base font-bold tabular-nums">
                     {row.points}

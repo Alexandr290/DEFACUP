@@ -2,16 +2,18 @@
 
 import { Button } from "@/components/ui/Button";
 import { Input, Label, Select } from "@/components/ui/Input";
+import { useI18n } from "@/lib/i18n/context";
+import type { TranslationKey } from "@/lib/i18n/context";
 import type { Tournament, TournamentSettings, Tiebreaker } from "@/lib/types";
 
-const TB_OPTIONS: { id: Tiebreaker; label: string }[] = [
-  { id: "points", label: "Points" },
-  { id: "goal_difference", label: "Goal difference" },
-  { id: "goals_for", label: "Goals for" },
-  { id: "head_to_head", label: "Head-to-head" },
-  { id: "fair_play", label: "Fair play" },
-  { id: "drawing_of_lots", label: "Drawing of lots" },
-];
+const TB_KEYS: Record<Tiebreaker, TranslationKey> = {
+  points: "settings.tb_points",
+  goal_difference: "settings.tb_goal_difference",
+  goals_for: "settings.tb_goals_for",
+  head_to_head: "settings.tb_head_to_head",
+  fair_play: "settings.tb_fair_play",
+  drawing_of_lots: "settings.tb_drawing_of_lots",
+};
 
 export function SettingsPanel({
   tournament,
@@ -22,28 +24,31 @@ export function SettingsPanel({
   onUpdate: (patch: Partial<Tournament>) => void;
   onSettings: (patch: Partial<TournamentSettings>) => void;
 }) {
+  const { t } = useI18n();
   const s = tournament.settings;
 
   return (
     <div className="space-y-6">
-      <h3 className="font-display text-2xl tracking-wide">Settings</h3>
+      <h3 className="font-display text-2xl tracking-wide">
+        {t("settings.title")}
+      </h3>
       <div className="grid gap-4 sm:grid-cols-2">
         <div>
-          <Label>Name</Label>
+          <Label>{t("settings.name")}</Label>
           <Input
             value={tournament.name}
             onChange={(e) => onUpdate({ name: e.target.value })}
           />
         </div>
         <div>
-          <Label>Season</Label>
+          <Label>{t("settings.season")}</Label>
           <Input
             value={tournament.season_label}
             onChange={(e) => onUpdate({ season_label: e.target.value })}
           />
         </div>
         <div>
-          <Label>Status</Label>
+          <Label>{t("settings.status")}</Label>
           <Select
             value={tournament.status}
             onChange={(e) =>
@@ -52,14 +57,14 @@ export function SettingsPanel({
               })
             }
           >
-            <option value="draft">Draft</option>
-            <option value="group">Group stage</option>
-            <option value="knockout">Knockout</option>
-            <option value="completed">Completed</option>
+            <option value="draft">{t("settings.statusDraft")}</option>
+            <option value="group">{t("settings.statusGroup")}</option>
+            <option value="knockout">{t("settings.statusKnockout")}</option>
+            <option value="completed">{t("settings.statusCompleted")}</option>
           </Select>
         </div>
         <div>
-          <Label>Visibility</Label>
+          <Label>{t("settings.visibility")}</Label>
           <Select
             value={tournament.visibility}
             onChange={(e) =>
@@ -68,13 +73,13 @@ export function SettingsPanel({
               })
             }
           >
-            <option value="private">Private</option>
-            <option value="unlisted">Unlisted</option>
-            <option value="public">Public</option>
+            <option value="private">{t("settings.private")}</option>
+            <option value="unlisted">{t("settings.unlisted")}</option>
+            <option value="public">{t("settings.public")}</option>
           </Select>
         </div>
         <div>
-          <Label>Points for win</Label>
+          <Label>{t("settings.pointsWin")}</Label>
           <Input
             type="number"
             value={s.points_win}
@@ -82,7 +87,7 @@ export function SettingsPanel({
           />
         </div>
         <div>
-          <Label>Points for draw</Label>
+          <Label>{t("settings.pointsDraw")}</Label>
           <Input
             type="number"
             value={s.points_draw}
@@ -92,7 +97,7 @@ export function SettingsPanel({
           />
         </div>
         <div>
-          <Label>Qualify per group</Label>
+          <Label>{t("settings.qualifyPerGroup")}</Label>
           <Input
             type="number"
             min={1}
@@ -104,7 +109,7 @@ export function SettingsPanel({
           />
         </div>
         <div>
-          <Label>Best thirds count</Label>
+          <Label>{t("settings.bestThirdsCount")}</Label>
           <Input
             type="number"
             min={0}
@@ -127,7 +132,7 @@ export function SettingsPanel({
             }
             className="accent-[var(--accent)]"
           />
-          3rd place match
+          {t("settings.thirdPlaceMatch")}
         </label>
         <label className="flex items-center gap-2">
           <input
@@ -136,7 +141,7 @@ export function SettingsPanel({
             onChange={(e) => onSettings({ knockout_et: e.target.checked })}
             className="accent-[var(--accent)]"
           />
-          Extra time
+          {t("settings.extraTime")}
         </label>
         <label className="flex items-center gap-2">
           <input
@@ -145,17 +150,17 @@ export function SettingsPanel({
             onChange={(e) => onSettings({ knockout_pens: e.target.checked })}
             className="accent-[var(--accent)]"
           />
-          Penalties
+          {t("settings.penalties")}
         </label>
       </div>
 
       <div>
-        <Label>Tiebreaker order</Label>
+        <Label>{t("settings.tiebreakerOrder")}</Label>
         <div className="mt-2 space-y-1">
           {s.tiebreakers.map((tb, idx) => (
             <div key={tb} className="flex items-center gap-2 text-sm">
               <span className="w-6 text-mist">{idx + 1}.</span>
-              <span>{TB_OPTIONS.find((o) => o.id === tb)?.label ?? tb}</span>
+              <span>{t(TB_KEYS[tb])}</span>
               <Button
                 size="sm"
                 variant="ghost"

@@ -5,10 +5,12 @@ import { useRouter } from "next/navigation";
 import { FormEvent, useState } from "react";
 import { Button } from "@/components/ui/Button";
 import { Input, Label } from "@/components/ui/Input";
+import { useI18n } from "@/lib/i18n/context";
 import { createClient, isSupabaseConfigured } from "@/lib/supabase/client";
 
 export default function SignupPage() {
   const router = useRouter();
+  const { t } = useI18n();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [displayName, setDisplayName] = useState("");
@@ -20,9 +22,7 @@ export default function SignupPage() {
     e.preventDefault();
     setError(null);
     if (!isSupabaseConfigured()) {
-      setMessage(
-        "Supabase is not configured. Copy .env.local.example to .env.local and add your project keys, then run the SQL migration."
-      );
+      setMessage(t("auth.noSupabaseSignup"));
       return;
     }
     setLoading(true);
@@ -37,10 +37,10 @@ export default function SignupPage() {
         },
       });
       if (err) throw err;
-      setMessage("Account created. Check your email if confirmation is required.");
+      setMessage(t("auth.accountCreated"));
       router.push("/dashboard");
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Sign-up failed");
+      setError(err instanceof Error ? err.message : t("auth.signUpFailed"));
     } finally {
       setLoading(false);
     }
@@ -48,13 +48,13 @@ export default function SignupPage() {
 
   return (
     <div className="mx-auto flex min-h-[70vh] max-w-md flex-col justify-center px-4 py-16">
-      <h1 className="font-display text-5xl tracking-wide">Create account</h1>
-      <p className="mt-2 text-mist">
-        Save tournaments to Supabase and share them across devices.
-      </p>
+      <h1 className="font-display text-5xl tracking-wide">
+        {t("auth.signupTitle")}
+      </h1>
+      <p className="mt-2 text-mist">{t("auth.signupSub")}</p>
       <form onSubmit={onSubmit} className="mt-8 space-y-4">
         <div>
-          <Label>Display name</Label>
+          <Label>{t("auth.displayName")}</Label>
           <Input
             value={displayName}
             onChange={(e) => setDisplayName(e.target.value)}
@@ -62,7 +62,7 @@ export default function SignupPage() {
           />
         </div>
         <div>
-          <Label>Email</Label>
+          <Label>{t("auth.email")}</Label>
           <Input
             type="email"
             required
@@ -71,7 +71,7 @@ export default function SignupPage() {
           />
         </div>
         <div>
-          <Label>Password</Label>
+          <Label>{t("auth.password")}</Label>
           <Input
             type="password"
             required
@@ -83,13 +83,13 @@ export default function SignupPage() {
         {error && <p className="text-sm text-danger">{error}</p>}
         {message && <p className="text-sm text-accent">{message}</p>}
         <Button type="submit" className="w-full" disabled={loading}>
-          {loading ? "Creating…" : "Sign up"}
+          {loading ? t("auth.creating") : t("auth.signUp")}
         </Button>
       </form>
       <p className="mt-4 text-sm text-mist">
-            Already have an account?{" "}
+        {t("auth.alreadyHave")}{" "}
         <Link href="/login" className="text-accent hover:underline">
-          Sign in
+          {t("auth.signInLink")}
         </Link>
       </p>
     </div>

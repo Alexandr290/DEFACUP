@@ -75,6 +75,11 @@ body {
   letter-spacing: 0.02em;
 }
 
+.font-brand {
+  font-family: var(--font-display-brand), var(--font-display), Impact, sans-serif;
+  letter-spacing: 0.02em;
+}
+
 .pitch-bg {
   background:
     radial-gradient(ellipse 80% 50% at 50% 0%, rgba(20, 168, 92, 0.22), transparent 55%),

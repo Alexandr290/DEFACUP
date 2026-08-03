@@ -8,6 +8,7 @@ import { KnockoutBracket } from "@/components/bracket/KnockoutBracket";
 import { MatchCenter } from "@/components/matches/MatchCenter";
 import { GroupTable } from "@/components/tables/GroupTable";
 import { Button } from "@/components/ui/Button";
+import { useI18n } from "@/lib/i18n/context";
 import { computeBestThirds, computeStandings } from "@/lib/standings";
 import { useTournamentStore } from "@/lib/storage/store";
 import { cn } from "@/lib/utils";
@@ -15,6 +16,7 @@ import { cn } from "@/lib/utils";
 export default function PublicTournamentPage() {
   const params = useParams();
   const slug = params.slug as string;
+  const { t } = useI18n();
   const { current, loadBySlug, loading } = useTournamentStore();
   const [view, setView] = useState<"tables" | "matches" | "knockout">("tables");
 
@@ -22,7 +24,6 @@ export default function PublicTournamentPage() {
     loadBySlug(slug);
   }, [slug, loadBySlug]);
 
-  // Realtime when Supabase configured
   useEffect(() => {
     if (!isSupabaseConfigured() || !current) return;
     const supabase = createClient();
@@ -76,56 +77,53 @@ export default function PublicTournamentPage() {
   }, [current, groupStandings]);
 
   if (loading && !current) {
-    return <div className="p-10 text-mist">Loading…</div>;
+    return <div className="p-10 text-mist">{t("public.loading")}</div>;
   }
 
   if (!current) {
     return (
       <div className="mx-auto max-w-3xl px-4 py-20">
-        <h1 className="font-display text-4xl">Tournament not found</h1>
-        <p className="mt-2 text-mist">
-          This link may be private or the tournament was deleted.
-        </p>
+        <h1 className="font-display text-4xl">{t("public.notFound")}</h1>
+        <p className="mt-2 text-mist">{t("public.notFoundBody")}</p>
         <Link href="/" className="mt-4 inline-block text-accent">
-          Go home
+          {t("public.goHome")}
         </Link>
       </div>
     );
   }
 
-  const t = current.tournament;
+  const tourney = current.tournament;
+  const views = [
+    ["tables", t("public.tables")],
+    ["matches", t("public.matches")],
+    ["knockout", t("public.knockout")],
+  ] as const;
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6">
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div>
           <p className="text-xs uppercase tracking-wider text-accent">
-            {t.season_label} · {t.status}
+            {tourney.season_label} · {tourney.status}
           </p>
           <h1 className="font-display text-5xl tracking-wide sm:text-6xl">
-            {t.name}
+            {tourney.name}
           </h1>
         </div>
         <div className="flex gap-2 no-print">
-          <Link href={`/t/${t.slug}/edit`}>
+          <Link href={`/t/${tourney.slug}/edit`}>
             <Button variant="secondary" size="sm">
-              Edit
+              {t("public.edit")}
             </Button>
           </Link>
           <Button size="sm" variant="ghost" onClick={() => window.print()}>
-            Print
+            {t("public.print")}
           </Button>
         </div>
       </div>
 
       <div className="no-print mt-6 flex gap-2">
-        {(
-          [
-            ["tables", "Tables"],
-            ["matches", "Matches"],
-            ["knockout", "Knockout"],
-          ] as const
-        ).map(([id, label]) => (
+        {views.map(([id, label]) => (
           <button
             key={id}
             type="button"
@@ -152,14 +150,16 @@ export default function PublicTournamentPage() {
                   title={group.name}
                   standings={rows}
                   teams={current.teams}
-                  qualifyCount={t.settings.qualify_count}
-                  bestThirdHighlight={t.settings.best_thirds_count > 0}
+                  qualifyCount={tourney.settings.qualify_count}
+                  bestThirdHighlight={tourney.settings.best_thirds_count > 0}
                 />
               ))}
             </div>
             {bestThirds.length > 0 && (
               <div className="rounded-lg border border-gold/30 p-4">
-                <h3 className="font-display text-2xl">Best thirds</h3>
+                <h3 className="font-display text-2xl">
+                  {t("public.bestThirds")}
+                </h3>
                 <div className="mt-2 flex flex-wrap gap-2">
                   {bestThirds.map((row) => {
                     const team = current.teams.find((x) => x.id === row.teamId);
@@ -168,7 +168,7 @@ export default function PublicTournamentPage() {
                         key={row.teamId}
                         className="rounded border border-border px-3 py-1 text-sm"
                       >
-                        {team?.name} ({row.points} pts)
+                        {team?.name} ({row.points} {t("edit.pts")})
                       </span>
                     );
                   })}
@@ -193,7 +193,6 @@ export default function PublicTournamentPage() {
           />
         )}
       </div>
-
-      </div>
+    </div>
   );
 }

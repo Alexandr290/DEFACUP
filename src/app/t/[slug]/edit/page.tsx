@@ -20,6 +20,7 @@ import { Button } from "@/components/ui/Button";
 import { computeBestThirds, computeStandings } from "@/lib/standings";
 import { exportBundleJson } from "@/lib/storage/local";
 import { useTournamentStore } from "@/lib/storage/store";
+import { useI18n } from "@/lib/i18n/context";
 import { cn } from "@/lib/utils";
 
 type Tab =
@@ -33,6 +34,7 @@ type Tab =
 export default function EditTournamentPage() {
   const params = useParams();
   const slug = params.slug as string;
+  const { t } = useI18n();
   const [tab, setTab] = useState<Tab>("overview");
   const [savedFlash, setSavedFlash] = useState(false);
 
@@ -92,29 +94,29 @@ export default function EditTournamentPage() {
 
   if (loading && !current) {
     return (
-      <div className="mx-auto max-w-7xl px-4 py-20 text-mist">Loading tournament…</div>
+      <div className="mx-auto max-w-7xl px-4 py-20 text-mist">{t("edit.loading")}</div>
     );
   }
 
   if (!current) {
     return (
       <div className="mx-auto max-w-7xl px-4 py-20">
-        <h1 className="font-display text-4xl">Tournament not found</h1>
+        <h1 className="font-display text-4xl">{t("edit.notFound")}</h1>
         <Link href="/dashboard" className="mt-4 inline-block text-accent">
-          Back to dashboard
+          {t("edit.backDashboard")}
         </Link>
       </div>
     );
   }
 
-  const t = current.tournament;
+  const tourney = current.tournament;
   const tabs: { id: Tab; label: string }[] = [
-    { id: "overview", label: "Tables" },
-    { id: "teams", label: "Teams" },
-    { id: "draw", label: "Draw" },
-    { id: "matches", label: "Matches" },
-    { id: "knockout", label: "Knockout" },
-    { id: "settings", label: "Settings" },
+    { id: "overview", label: t("edit.tabTables") },
+    { id: "teams", label: t("edit.tabTeams") },
+    { id: "draw", label: t("edit.tabDraw") },
+    { id: "matches", label: t("edit.tabMatches") },
+    { id: "knockout", label: t("edit.tabKnockout") },
+    { id: "settings", label: t("edit.tabSettings") },
   ];
 
   const handleSave = async () => {
@@ -129,7 +131,7 @@ export default function EditTournamentPage() {
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
-    a.download = `${t.slug}.json`;
+    a.download = `${tourney.slug}.json`;
     a.click();
     URL.revokeObjectURL(url);
   };
@@ -139,10 +141,10 @@ export default function EditTournamentPage() {
       <div className="flex flex-wrap items-start justify-between gap-4">
         <div>
           <p className="text-xs uppercase tracking-wider text-accent">
-            {t.template_id} · {t.status} · /{t.slug}
+            {tourney.template_id} · {tourney.status} · /{tourney.slug}
           </p>
-          <h1 className="font-display text-5xl tracking-wide">{t.name}</h1>
-          <p className="text-mist">{t.season_label}</p>
+          <h1 className="font-display text-5xl tracking-wide">{tourney.name}</h1>
+          <p className="text-mist">{tourney.season_label}</p>
         </div>
         <div className="flex flex-wrap gap-2 no-print">
           <Button
@@ -151,37 +153,36 @@ export default function EditTournamentPage() {
             onClick={() => setWhatIf(!whatIfEnabled)}
           >
             <FlaskConical className="h-3.5 w-3.5" />
-            What-if
+            {t("edit.whatIf")}
           </Button>
           <Button size="sm" variant="secondary" onClick={seedKnockout}>
             <Swords className="h-3.5 w-3.5" />
-            Seed knockout
+            {t("edit.seedKnockout")}
           </Button>
           <Button size="sm" variant="secondary" onClick={handleExport}>
             <Download className="h-3.5 w-3.5" />
-            Export
+            {t("edit.export")}
           </Button>
           <Button size="sm" variant="secondary" onClick={() => window.print()}>
             <Printer className="h-3.5 w-3.5" />
-            Print
+            {t("edit.print")}
           </Button>
-          <Link href={`/t/${t.slug}`} target="_blank">
+          <Link href={`/t/${tourney.slug}`} target="_blank">
             <Button size="sm" variant="secondary">
               <ExternalLink className="h-3.5 w-3.5" />
-              Share view
+              {t("edit.shareView")}
             </Button>
           </Link>
           <Button size="sm" onClick={handleSave}>
             <Save className="h-3.5 w-3.5" />
-            {savedFlash ? "Saved" : "Save"}
+            {savedFlash ? t("edit.saved") : t("edit.save")}
           </Button>
         </div>
       </div>
 
       {whatIfEnabled && (
         <div className="mt-4 rounded-md border border-gold/40 bg-gold/10 px-4 py-2 text-sm">
-          What-if mode is on — simulated scores affect tables only until you turn it off.
-          Real results are unchanged.
+          {t("edit.whatIfBanner")}
         </div>
       )}
 
@@ -213,18 +214,18 @@ export default function EditTournamentPage() {
                   title={group.name}
                   standings={rows}
                   teams={current.teams}
-                  qualifyCount={t.settings.qualify_count}
-                  bestThirdHighlight={t.settings.best_thirds_count > 0}
+                  qualifyCount={tourney.settings.qualify_count}
+                  bestThirdHighlight={tourney.settings.best_thirds_count > 0}
                 />
               ))}
             </div>
             {bestThirds.length > 0 && (
               <div className="rounded-lg border border-gold/30 bg-gold/5 p-4">
                 <h3 className="font-display text-2xl tracking-wide">
-                  Best third places
+                  {t("edit.bestThirds")}
                 </h3>
                 <p className="text-sm text-mist mb-3">
-                  Top {t.settings.best_thirds_count} thirds advance
+                  {t("edit.bestThirdsSub", { count: tourney.settings.best_thirds_count })}
                 </p>
                 <div className="flex flex-wrap gap-2">
                   {bestThirds.map((row) => {
@@ -234,7 +235,7 @@ export default function EditTournamentPage() {
                         key={row.teamId}
                         className="rounded border border-border bg-surface px-3 py-1.5 text-sm"
                       >
-                        {team?.name} · {row.points} pts · GD{" "}
+                        {team?.name} · {row.points} {t("edit.pts")} · {t("table.gd")}{" "}
                         {row.goalDifference > 0 ? "+" : ""}
                         {row.goalDifference}
                       </span>
@@ -269,7 +270,7 @@ export default function EditTournamentPage() {
 
         {tab === "matches" && (
           <MatchCenter
-            title="Group stage fixtures"
+            title={t("edit.groupFixtures")}
             matches={current.matches.filter((m) => m.stage === "group")}
             teams={current.teams}
             editable
@@ -292,7 +293,7 @@ export default function EditTournamentPage() {
 
         {tab === "settings" && (
           <SettingsPanel
-            tournament={t}
+            tournament={tourney}
             onUpdate={updateTournament}
             onSettings={updateSettings}
           />

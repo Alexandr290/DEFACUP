@@ -3,8 +3,9 @@
 import { motion } from "framer-motion";
 import { getChampion, matchWinner, slotLabel } from "@/lib/bracket";
 import type { BracketSlot, Match, MatchStage, Team } from "@/lib/types";
-import { stageLabel } from "@/lib/utils";
 import { MatchScoreRow } from "@/components/matches/MatchCenter";
+import { useI18n } from "@/lib/i18n/context";
+import { stageKey } from "@/lib/i18n/keys";
 
 const ROUND_ORDER: MatchStage[] = ["r16", "qf", "sf", "third", "final"];
 
@@ -21,7 +22,8 @@ export function KnockoutBracket({
   editable?: boolean;
   onUpdate?: (id: string, patch: Partial<Match>) => void;
 }) {
-  const teamMap = new Map(teams.map((t) => [t.id, t]));
+  const { t } = useI18n();
+  const teamMap = new Map(teams.map((team) => [team.id, team]));
   const knockout = matches.filter((m) => m.stage !== "group");
   const rounds = ROUND_ORDER.filter((r) =>
     knockout.some((m) => m.stage === r)
@@ -38,8 +40,12 @@ export function KnockoutBracket({
           animate={{ opacity: 1, y: 0 }}
           className="rounded-lg border border-gold/40 bg-gold/10 px-6 py-5 text-center"
         >
-          <p className="text-xs uppercase tracking-[0.2em] text-gold">Champion</p>
-          <p className="font-display mt-1 text-4xl tracking-wide">{champion.name}</p>
+          <p className="text-xs uppercase tracking-[0.2em] text-gold">
+            {t("bracket.champion")}
+          </p>
+          <p className="font-display mt-1 text-4xl tracking-wide">
+            {champion.name}
+          </p>
         </motion.div>
       )}
 
@@ -54,7 +60,7 @@ export function KnockoutBracket({
             return (
               <div key={round} className="w-[300px] shrink-0 space-y-3">
                 <h4 className="font-display text-xl tracking-wide text-accent">
-                  {stageLabel(round)}
+                  {t(stageKey(round))}
                 </h4>
                 {roundMatches.map((m, i) => {
                   const homeSlot = slots.find(
@@ -69,6 +75,7 @@ export function KnockoutBracket({
                       s.position === m.bracket_position &&
                       s.side === "away"
                   );
+                  const winner = matchWinner(m);
                   return (
                     <motion.div
                       key={m.id}
@@ -80,7 +87,9 @@ export function KnockoutBracket({
                       {!m.home_team_id && homeSlot && (
                         <p className="text-[10px] text-mist px-1">
                           {slotLabel(homeSlot, teams)} vs{" "}
-                          {awaySlot ? slotLabel(awaySlot, teams) : "TBD"}
+                          {awaySlot
+                            ? slotLabel(awaySlot, teams)
+                            : t("matches.tbd")}
                         </p>
                       )}
                       <MatchScoreRow
@@ -89,9 +98,11 @@ export function KnockoutBracket({
                         editable={editable}
                         onSave={(patch) => onUpdate?.(m.id, patch)}
                       />
-                      {matchWinner(m) && (
+                      {winner && (
                         <p className="px-1 text-[11px] text-accent">
-                          → {teamMap.get(matchWinner(m)!)?.short_code} advances
+                          {t("bracket.advances", {
+                            code: teamMap.get(winner)?.short_code ?? "",
+                          })}
                         </p>
                       )}
                     </motion.div>

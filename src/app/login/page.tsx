@@ -5,10 +5,12 @@ import { useRouter } from "next/navigation";
 import { FormEvent, useState } from "react";
 import { Button } from "@/components/ui/Button";
 import { Input, Label } from "@/components/ui/Input";
+import { useI18n } from "@/lib/i18n/context";
 import { createClient, isSupabaseConfigured } from "@/lib/supabase/client";
 
 export default function LoginPage() {
   const router = useRouter();
+  const { t } = useI18n();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [mode, setMode] = useState<"password" | "magic">("password");
@@ -22,9 +24,7 @@ export default function LoginPage() {
     setMessage(null);
 
     if (!isSupabaseConfigured()) {
-      setMessage(
-        "Supabase is not configured. You can use the dashboard in local mode without signing in — tournaments save to this browser."
-      );
+      setMessage(t("auth.noSupabaseLogin"));
       return;
     }
 
@@ -34,10 +34,12 @@ export default function LoginPage() {
       if (mode === "magic") {
         const { error: err } = await supabase.auth.signInWithOtp({
           email,
-          options: { emailRedirectTo: `${window.location.origin}/auth/callback` },
+          options: {
+            emailRedirectTo: `${window.location.origin}/auth/callback`,
+          },
         });
         if (err) throw err;
-        setMessage("Check your email for the magic link.");
+        setMessage(t("auth.magicSent"));
       } else {
         const { error: err } = await supabase.auth.signInWithPassword({
           email,
@@ -47,7 +49,7 @@ export default function LoginPage() {
         router.push("/dashboard");
       }
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Sign-in failed");
+      setError(err instanceof Error ? err.message : t("auth.signInFailed"));
     } finally {
       setLoading(false);
     }
@@ -55,13 +57,13 @@ export default function LoginPage() {
 
   return (
     <div className="mx-auto flex min-h-[70vh] max-w-md flex-col justify-center px-4 py-16">
-      <h1 className="font-display text-5xl tracking-wide">Sign in</h1>
-      <p className="mt-2 text-mist">
-        Sync tournaments with Supabase, or continue in local mode.
-      </p>
+      <h1 className="font-display text-5xl tracking-wide">
+        {t("auth.signInTitle")}
+      </h1>
+      <p className="mt-2 text-mist">{t("auth.signInSub")}</p>
       <form onSubmit={onSubmit} className="mt-8 space-y-4">
         <div>
-          <Label>Email</Label>
+          <Label>{t("auth.email")}</Label>
           <Input
             type="email"
             required
@@ -72,7 +74,7 @@ export default function LoginPage() {
         </div>
         {mode === "password" && (
           <div>
-            <Label>Password</Label>
+            <Label>{t("auth.password")}</Label>
             <Input
               type="password"
               required
@@ -85,10 +87,10 @@ export default function LoginPage() {
         {message && <p className="text-sm text-accent">{message}</p>}
         <Button type="submit" className="w-full" disabled={loading}>
           {loading
-            ? "Please wait…"
+            ? t("auth.pleaseWait")
             : mode === "magic"
-              ? "Send magic link"
-              : "Sign in"}
+              ? t("auth.sendMagic")
+              : t("auth.signIn")}
         </Button>
       </form>
       <div className="mt-4 flex flex-wrap gap-3 text-sm">
@@ -97,13 +99,13 @@ export default function LoginPage() {
           className="text-mist hover:text-accent"
           onClick={() => setMode(mode === "password" ? "magic" : "password")}
         >
-          {mode === "password" ? "Use magic link" : "Use password"}
+          {mode === "password" ? t("auth.useMagic") : t("auth.usePassword")}
         </button>
         <Link href="/signup" className="text-mist hover:text-accent">
-          Create account
+          {t("auth.createAccount")}
         </Link>
         <Link href="/dashboard" className="text-mist hover:text-accent">
-          Continue locally →
+          {t("auth.continueLocal")}
         </Link>
       </div>
     </div>

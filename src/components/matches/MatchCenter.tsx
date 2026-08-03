@@ -3,11 +3,12 @@
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/Button";
 import type { Match, Team } from "@/lib/types";
+import { useI18n } from "@/lib/i18n/context";
 import { cn } from "@/lib/utils";
 
-function TeamChip({ team }: { team: Team | undefined }) {
+function TeamChip({ team, tbd }: { team: Team | undefined; tbd: string }) {
   if (!team) {
-    return <span className="text-mist">TBD</span>;
+    return <span className="text-mist">{tbd}</span>;
   }
   return (
     <span className="flex items-center gap-2 font-semibold">
@@ -39,6 +40,7 @@ export function MatchScoreRow({
   onSave?: (patch: Partial<Match>) => void;
   onWhatIf?: (scores: { home: number; away: number } | null) => void;
 }) {
+  const { t } = useI18n();
   const teamMap = new Map(teams.map((t) => [t.id, t]));
   const home = match.home_team_id ? teamMap.get(match.home_team_id) : undefined;
   const away = match.away_team_id ? teamMap.get(match.away_team_id) : undefined;
@@ -91,7 +93,7 @@ export function MatchScoreRow({
       )}
     >
       <div className="justify-self-end text-right">
-        <TeamChip team={home} />
+        <TeamChip team={home} tbd={t("matches.tbd")} />
       </div>
       <div className="flex flex-col items-center gap-1">
         {editable ? (
@@ -134,7 +136,7 @@ export function MatchScoreRow({
             className="text-[10px] uppercase tracking-wider text-mist hover:text-accent"
             onClick={() => setShowPens((v) => !v)}
           >
-            {showPens ? "Hide pens" : "Pens / ET"}
+            {showPens ? t("matches.hidePens") : t("matches.pensEt")}
           </button>
         )}
         {editable && showPens && match.stage !== "group" && (
@@ -146,7 +148,7 @@ export function MatchScoreRow({
               onBlur={() => commit()}
               placeholder="P"
             />
-            <span className="text-xs text-mist">pens</span>
+            <span className="text-xs text-mist">{t("matches.pens")}</span>
             <input
               className="h-7 w-8 rounded border border-border bg-surface text-center text-sm tabular-nums"
               value={ap}
@@ -164,7 +166,7 @@ export function MatchScoreRow({
               className="h-6 px-2 text-[10px]"
               onClick={() => commit("live")}
             >
-              Live
+              {t("matches.live")}
             </Button>
             <Button
               size="sm"
@@ -180,19 +182,19 @@ export function MatchScoreRow({
                 })
               }
             >
-              Clear
+              {t("matches.clear")}
             </Button>
           </div>
         )}
         {match.label && (
           <span className="text-[10px] uppercase tracking-wider text-mist">
             {match.label}
-            {match.status === "live" && " · LIVE"}
+            {match.status === "live" && t("matches.liveSuffix")}
           </span>
         )}
       </div>
       <div className="justify-self-start">
-        <TeamChip team={away} />
+        <TeamChip team={away} tbd={t("matches.tbd")} />
       </div>
     </div>
   );
@@ -220,6 +222,7 @@ export function MatchCenter({
   ) => void;
   title?: string;
 }) {
+  const { t } = useI18n();
   const byDay = new Map<number | string, Match[]>();
   for (const m of matches) {
     const key = m.match_day ?? m.stage;
@@ -235,7 +238,7 @@ export function MatchCenter({
       {[...byDay.entries()].map(([day, list]) => (
         <div key={String(day)} className="space-y-2">
           <p className="text-xs uppercase tracking-wider text-mist">
-            {typeof day === "number" ? `Matchday ${day}` : String(day)}
+            {typeof day === "number" ? t("matches.matchday", { n: day }) : String(day)}
           </p>
           {list.map((m) => (
             <MatchScoreRow
@@ -253,7 +256,7 @@ export function MatchCenter({
       ))}
       {matches.length === 0 && (
         <p className="text-sm text-mist">
-          No fixtures yet. Assign teams to groups and generate fixtures.
+          {t("matches.empty")}
         </p>
       )}
     </div>

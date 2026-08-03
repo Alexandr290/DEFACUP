@@ -4,20 +4,26 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import { Moon, Sun, Trophy } from "lucide-react";
+import { LanguageSwitcher } from "./LanguageSwitcher";
 import { Button } from "./ui/Button";
+import { useI18n } from "@/lib/i18n/context";
 import { cn } from "@/lib/utils";
 import { createClient, isSupabaseConfigured } from "@/lib/supabase/client";
 
 export function SiteNav() {
   const pathname = usePathname();
+  const { t } = useI18n();
   const [theme, setTheme] = useState<"dark" | "light">("dark");
   const [email, setEmail] = useState<string | null>(null);
 
   useEffect(() => {
     const stored = localStorage.getItem("defacup:theme") as "dark" | "light" | null;
-    const t = stored ?? "dark";
-    setTheme(t);
-    document.documentElement.setAttribute("data-theme", t === "light" ? "light" : "");
+    const next = stored ?? "dark";
+    setTheme(next);
+    document.documentElement.setAttribute(
+      "data-theme",
+      next === "light" ? "light" : ""
+    );
   }, []);
 
   useEffect(() => {
@@ -43,8 +49,8 @@ export function SiteNav() {
   };
 
   const links = [
-    { href: "/dashboard", label: "Dashboard" },
-    { href: "/templates", label: "Templates" },
+    { href: "/dashboard", label: t("nav.dashboard") },
+    { href: "/templates", label: t("nav.templates") },
   ];
 
   return (
@@ -54,7 +60,7 @@ export function SiteNav() {
           <span className="flex h-8 w-8 items-center justify-center rounded bg-accent text-white">
             <Trophy className="h-4 w-4" />
           </span>
-          <span className="font-display text-xl tracking-wide group-hover:text-accent transition-colors">
+          <span className="font-brand text-xl tracking-wide group-hover:text-accent transition-colors">
             DEFACUP
           </span>
         </Link>
@@ -75,13 +81,18 @@ export function SiteNav() {
           ))}
         </nav>
         <div className="flex items-center gap-2">
+          <LanguageSwitcher />
           <button
             type="button"
             onClick={toggleTheme}
             className="rounded-md p-2 text-mist hover:text-foreground hover:bg-white/5"
-            aria-label="Toggle theme"
+            aria-label={t("nav.toggleTheme")}
           >
-            {theme === "dark" ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
+            {theme === "dark" ? (
+              <Sun className="h-4 w-4" />
+            ) : (
+              <Moon className="h-4 w-4" />
+            )}
           </button>
           {email ? (
             <Link href="/dashboard">
@@ -93,11 +104,11 @@ export function SiteNav() {
             <>
               <Link href="/login" className="hidden sm:block">
                 <Button variant="ghost" size="sm">
-                  Sign in
+                  {t("nav.signIn")}
                 </Button>
               </Link>
               <Link href="/dashboard">
-                <Button size="sm">Open app</Button>
+                <Button size="sm">{t("nav.openApp")}</Button>
               </Link>
             </>
           )}
